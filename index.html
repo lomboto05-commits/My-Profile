@@ -53,12 +53,18 @@ nav.scrolled{border-color:var(--line)}
 .nav-inner{max-width:var(--max);margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--fog);letter-spacing:.02em}
 .logo b{color:var(--cyan)}
-.nav-links{display:flex;gap:26px;font-size:14px}
+.nav-links{display:flex;align-items:center;gap:26px;font-size:14px}
 .nav-links a{color:var(--slate);transition:color .25s}
 .nav-links a:hover{color:var(--fog);text-decoration:none}
 .nav-cta{font-family:var(--mono);font-size:13px;color:var(--ink)!important;background:var(--cyan);padding:7px 14px;border-radius:8px;transition:transform .25s var(--ease), box-shadow .25s}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(102,195,218,.22);text-decoration:none}
-@media(max-width:720px){.nav-links a:not(.nav-cta){display:none}}
+@media(max-width:720px){
+  .nav-links a:not(.nav-cta){display:none}
+  .nav-inner{padding:12px 20px}
+  .logo{font-size:14px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .logo span{display:none}
+  .nav-cta{flex:none;white-space:nowrap}
+}
 
 /* ---------- hero ---------- */
 header{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:90px}
@@ -87,12 +93,12 @@ h1 .accent{color:var(--cyan)}
 .kpi:nth-child(even) .num{color:var(--amber)}
 .kpi .lbl{font-size:12.5px;color:var(--slate);margin-top:4px;letter-spacing:.02em}
 @media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}}
-#funnelCanvas{position:absolute;inset:0;z-index:-1;opacity:.55}
+#funnelCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1;opacity:.55}
 .scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--slate);font-family:var(--mono);font-size:12px;letter-spacing:.15em;animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
 
 /* ---------- sections ---------- */
-section{padding:110px 0;position:relative}
+section{padding:clamp(74px,6vw,92px) 0;position:relative;border-top:1px solid var(--line)}
 .sec-head{margin-bottom:56px;max-width:720px}
 .sec-eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
 .sec-eyebrow::before{content:"";width:26px;height:1px;background:var(--cyan)}
@@ -141,6 +147,22 @@ h2{font-size:clamp(1.9rem,4.4vw,2.9rem);font-weight:700;margin:16px 0 14px}
 .repo-link{font-family:var(--mono);font-size:14px;display:inline-flex;align-items:center;gap:8px;margin-top:6px}
 .repo-link svg{transition:transform .3s var(--ease)}
 .repo-link:hover svg{transform:translate(3px,-3px)}
+/* use-story lead + loop map (ties each case to Instrument → Measure → Validate → Explain) */
+.case-scenario{font-size:1.03rem;color:var(--fog);line-height:1.55;border-left:2px solid var(--cyan);padding-left:16px;margin:2px 0 20px}
+.case.amber .case-scenario{border-left-color:var(--amber)}
+.case-scenario b{font-weight:600}
+.loop-map{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:0 0 22px;background:rgba(255,255,255,.015)}
+.lm{display:grid;grid-template-columns:112px 1fr;gap:16px;padding:14px 18px;border-top:1px solid var(--line);align-items:baseline}
+.lm:first-child{border-top:none}
+.lm-k{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:9px;white-space:nowrap}
+.lm-k::before{content:"";width:7px;height:7px;border-radius:2px;flex:none}
+.lm.cool .lm-k{color:var(--cyan)}
+.lm.cool .lm-k::before{background:var(--cyan);box-shadow:0 0 7px rgba(102,195,218,.7)}
+.lm.warm .lm-k{color:var(--amber)}
+.lm.warm .lm-k::before{background:var(--amber);box-shadow:0 0 7px rgba(227,154,106,.7)}
+.lm-v{font-size:.92rem;color:var(--slate);line-height:1.5}
+.lm-v b{color:var(--fog);font-weight:600}
+@media(max-width:520px){.lm{grid-template-columns:1fr;gap:4px;padding:12px 15px}}
 .case-viz{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;padding:30px 28px;position:relative;overflow:hidden}
 .case-viz::before{content:attr(data-title);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);display:block;margin-bottom:22px}
 .viz-note{font-size:12px;color:var(--slate);font-family:var(--mono);margin-top:18px}
@@ -260,6 +282,29 @@ h2{font-size:clamp(1.9rem,4.4vw,2.9rem);font-weight:700;margin:16px 0 14px}
 footer{border-top:1px solid var(--line);padding:26px 0;color:var(--slate);font-size:13px;font-family:var(--mono)}
 .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
+/* ---------- mobile refinements ---------- */
+@media(max-width:640px){
+  .wrap{padding:0 20px}
+  header{padding-top:80px}
+  .sec-head{margin-bottom:38px}
+  h1{margin-top:14px}
+  .kpis{margin-top:40px}
+  .kpi{padding:17px 16px}
+  .case{padding:44px 0;gap:30px}
+  .case-viz{padding:24px 20px}
+  .validate{padding:32px 22px;gap:34px}
+  .stack{padding:22px 20px}
+  .hero-ctas{gap:10px}
+}
+@media(max-width:400px){
+  h1{font-size:clamp(2.25rem,9vw,4.9rem)}
+  .fun-row{grid-template-columns:86px 1fr 30px;gap:10px}
+  .seg-row{grid-template-columns:78px 1fr 72px;gap:9px}
+  .seg-val{font-size:12px;white-space:nowrap}
+  .donut-row{gap:18px}
+  .donut{width:104px;height:104px}
+}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important;animation-delay:0s!important;transition-delay:0s!important}
   .io{opacity:1;transform:none}
@@ -291,7 +336,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--slate);font-s
     <p class="eyebrow fade-in">Galway, Ireland · Product &amp; UX Analytics</p>
     <h1>
       <span class="reveal-line"><span>I turn what users <em class="accent" style="font-style:normal">actually do</em></span></span>
-      <span class="reveal-line"><span>into metrics teams can trust.</span></span>
+      <span class="reveal-line"><span>into metrics <em class="accent" style="font-style:normal">UX Research</em> can trust.</span></span>
     </h1>
     <p class="sub fade-in d1">Data analyst working with <b>event-level product data</b>. I instrument websites with <b>Contentsquare</b>, analyse behaviour in <b>Snowflake SQL</b> and <b>Python</b>, and build <b>dashboards</b> where every number has a written definition and can be traced back to source.</p>
     <div class="hero-ctas fade-in d2">
@@ -348,7 +393,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--slate);font-s
     <div class="sec-head io">
       <p class="sec-eyebrow">Case studies</p>
       <h2 class="gh-head"><a href="https://github.com/lomboto05-commits" target="_blank" rel="noopener" class="gh-link"><svg class="gh-logo" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>On GitHub<span class="gh-arrow">↗</span></a></h2>
-      <p>The charts below use the actual numbers from each project. Hover over any bar or point for the detail. Each project links to its repository, where the SQL, notebooks and source exports are versioned.</p>
+      <p>Each project below is one full turn of that loop — a real question, the analysis, and how the numbers were checked — mapped stage by stage from instrument to explain. The charts use the actual figures from each repo; hover any bar or point for detail. Every project links to its versioned SQL, notebooks and source exports.</p>
     </div>
 
     <!-- Case 1 -->
@@ -356,13 +401,13 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--slate);font-s
       <div class="case-body">
         <span class="case-tag">Snowflake · SQL · Power BI</span>
         <h3>Same data, two answers: why metric definitions matter</h3>
-        <p>884,474 e-commerce events analysed through a layered RAW to CLEANED pipeline in Snowflake, ending in a Power BI dashboard. The most important result wasn't a number, it was a <b>definition</b>.</p>
-        <ul>
-          <li>A simple event-count conversion rate gave <b>69.11%</b>. A <b>session-level funnel</b> (CTE with conditional aggregation) gave <b>50.31%</b>, nearly 19 points lower.</li>
-          <li>Checked the 50.31% with a <b>second, independent method</b> (LEFT JOIN of cart sessions to purchase sessions). Both methods agree.</li>
-          <li>Reconciled dashboard revenue to <b>€5.13M</b> by filtering every visual to purchase events only. The reconciliation query is committed in the repo.</li>
-          <li>Data quality first: NULL audits, duplicate detection, price and timestamp validation before any analysis ran.</li>
-        </ul>
+        <p class="case-scenario">A stakeholder asks for the cart-to-purchase conversion rate. Two reasonable SQL queries come back with <b>69.11%</b> and <b>50.31%</b> — nearly 19 points apart. The work is proving which one is true.</p>
+        <div class="loop-map">
+          <div class="lm cool"><span class="lm-k">Instrument</span><span class="lm-v">Layered RAW → CLEANED pipeline over <b>884,474 events</b>; NULL audits, duplicate detection and price/timestamp validation before any analysis ran.</span></div>
+          <div class="lm warm"><span class="lm-k">Measure</span><span class="lm-v">Session-level funnel via a CTE with conditional aggregation — the honest cart-to-purchase rate of <b>50.31%</b>.</span></div>
+          <div class="lm cool"><span class="lm-k">Validate</span><span class="lm-v">A second independent method (LEFT JOIN of cart to purchase sessions) returns the same 50.31%; dashboard revenue reconciled to <b>€5.13M</b>.</span></div>
+          <div class="lm warm"><span class="lm-k">Explain</span><span class="lm-v">Power BI dashboard filtered to purchase events, every metric defined in writing — including why the naive <b>69.11%</b> is the wrong grain.</span></div>
+        </div>
         <a class="repo-link" href="https://github.com/lomboto05-commits/E-commerce-user-behavior-snowflake" target="_blank" rel="noopener">View SQL &amp; dashboard on GitHub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
       </div>
       <div class="case-viz" data-title="Cart to purchase conversion · two definitions" id="morphViz">
@@ -404,13 +449,13 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--slate);font-s
       <div class="case-body">
         <span class="case-tag">Contentsquare · Instrumentation · Python</span>
         <h3>Instrumenting a live storefront, then fixing my own tracking</h3>
-        <p>To get real setup experience I deployed an open-source storefront, added the Contentsquare tag, and analysed the telemetry in Python. The most useful part was finding and fixing a problem in my own setup:</p>
-        <ul>
-          <li>Journey analysis surfaced an <b>unresolved page label</b>, caused by a gap in the page-name mapping. I traced the cause, configured <b>page groups</b> for Homepage, Listing, Detail and Cart, and measured again.</li>
-          <li>Built the resulting 4-stage funnel. The largest drop-off is at the <b>Product Detail to Cart</b> step (60%).</li>
-          <li>Made the analysis reproducible: label-based extraction from exports instead of fixed cell positions, with the source exports committed to the repo.</li>
-          <li>Every percentage is reported with its <b>sample size</b>. Seven sessions is a small sample, and the write-up says so.</li>
-        </ul>
+        <p class="case-scenario">To learn instrumentation for real, I deployed an open-source storefront and tagged it with Contentsquare. Then the analysis caught a bug in <b>my own tracking</b> — and fixing it became the case study.</p>
+        <div class="loop-map">
+          <div class="lm cool"><span class="lm-k">Instrument</span><span class="lm-v">Deployed the storefront and Contentsquare tag, then configured <b>page groups</b> for Homepage, Listing, Detail and Cart.</span></div>
+          <div class="lm warm"><span class="lm-k">Measure</span><span class="lm-v">Built the 4-stage journey funnel in Python; the largest drop-off is <b>Product Detail → Cart (60%)</b>.</span></div>
+          <div class="lm cool"><span class="lm-k">Validate</span><span class="lm-v">Journey analysis surfaced an <b>unresolved page label</b> from a mapping gap — traced to root cause, fixed, and re-measured.</span></div>
+          <div class="lm warm"><span class="lm-k">Explain</span><span class="lm-v">Every percentage reported with its <b>sample size</b> (7 sessions, stated as directional), from label-based, reproducible extraction.</span></div>
+        </div>
         <a class="repo-link" style="color:var(--amber)" href="https://github.com/lomboto05-commits/contentsquare-website-analytics" target="_blank" rel="noopener">View notebook &amp; exports on GitHub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
       </div>
     </div>
@@ -420,12 +465,13 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--slate);font-s
       <div class="case-body">
         <span class="case-tag">Python · Pandas · Segmentation</span>
         <h3>Customer value segmentation on 3,660 transactions</h3>
-        <p>Exploratory analysis of e-commerce transactions in Pandas: spend distribution, quartile value segments, and category, payment, pricing and discount behaviour.</p>
-        <ul>
-          <li>Quartile segmentation shows the <b>top-value quarter</b> of customers generating <b>45%</b> of total revenue, which makes the case for targeted retention.</li>
-          <li>Relationships that are true by arithmetic (price against final price) were used as <b>data checks</b>, not presented as findings.</li>
-          <li>Limitations are stated plainly: one transaction per customer means retention can't be measured, so it isn't claimed.</li>
-        </ul>
+        <p class="case-scenario">Which customers actually carry the revenue? Splitting 3,660 transactions into four equal-sized value segments turns a vague question into a number you can act on.</p>
+        <div class="loop-map">
+          <div class="lm cool"><span class="lm-k">Instrument</span><span class="lm-v">Structured customers into four equal-sized <b>quartile value segments</b> (915 each) from the transaction export in Pandas.</span></div>
+          <div class="lm warm"><span class="lm-k">Measure</span><span class="lm-v">The top-value quarter generates <b>45%</b> of total revenue — the case for targeted retention.</span></div>
+          <div class="lm cool"><span class="lm-k">Validate</span><span class="lm-v">Relationships true by arithmetic (price vs final price) used as <b>data checks</b>, not presented as findings.</span></div>
+          <div class="lm warm"><span class="lm-k">Explain</span><span class="lm-v">Limitations stated plainly: one transaction per customer means retention can't be measured, so it isn't claimed.</span></div>
+        </div>
         <a class="repo-link" href="https://github.com/lomboto05-commits/eCommerce-customer-analytics" target="_blank" rel="noopener">View analysis on GitHub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
       </div>
       <div class="case-viz" data-title="Revenue by customer value segment (quartiles of 915)" id="segViz">
