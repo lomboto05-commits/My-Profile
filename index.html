@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christian Lomboto | Data Analyst, Product &amp; UX Analytics</title>
+<meta name="description" content="Data analyst specialising in product and UX analytics: Snowflake SQL, Contentsquare instrumentation, session-level funnels, dashboards and metric validation. Based in Galway, Ireland.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230D1220'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='28' font-weight='700' fill='%2366C3DA' text-anchor='middle'%3ECL%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0D1220;
+  --ink-2:#111A2E;
+  --ink-3:#182238;
+  --line:#243051;
+  --fog:#E9EDF5;
+  --slate:#9AA5BE;
+  --cyan:#66C3DA;
+  --amber:#E39A6A;
+  --cyan-dim:rgba(102,195,218,.14);
+  --amber-dim:rgba(227,154,106,.14);
+  --disp:'Sora',sans-serif;
+  --body:'Instrument Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --max:1120px;
+  --ease:cubic-bezier(.22,.9,.28,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--fog);font-family:var(--body);font-size:17px;line-height:1.65;overflow-x:hidden}
+::selection{background:var(--cyan);color:var(--ink)}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+h1,h2,h3{font-family:var(--disp);line-height:1.12;letter-spacing:-.01em}
+.mono{font-family:var(--mono)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+/* ---------- grid backdrop ---------- */
+.backdrop{position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(1000px 500px at 80% -10%, rgba(102,195,218,.07), transparent 60%),
+  radial-gradient(800px 500px at 10% 110%, rgba(227,154,106,.05), transparent 60%),
+  var(--ink)}
+.backdrop::after{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(var(--line) 1px, transparent 1px),linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:56px 56px;opacity:.14;mask-image:radial-gradient(1200px 800px at 50% 20%, #000 30%, transparent 75%)}
+
+/* ---------- progress bar + nav ---------- */
+#progress{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--cyan),var(--amber));z-index:60;transition:width .1s linear}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(12px);background:rgba(13,18,32,.72);border-bottom:1px solid transparent;transition:border-color .4s var(--ease)}
+nav.scrolled{border-color:var(--line)}
+.nav-inner{max-width:var(--max);margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--fog);letter-spacing:.02em}
+.logo b{color:var(--cyan)}
+.nav-links{display:flex;gap:26px;font-size:14px}
+.nav-links a{color:var(--slate);transition:color .25s}
+.nav-links a:hover{color:var(--fog);text-decoration:none}
+.nav-cta{font-family:var(--mono);font-size:13px;color:var(--ink)!important;background:var(--cyan);padding:7px 14px;border-radius:8px;transition:transform .25s var(--ease), box-shadow .25s}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(102,195,218,.22);text-decoration:none}
+@media(max-width:720px){.nav-links a:not(.nav-cta){display:none}}
+
+/* ---------- hero ---------- */
+header{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:90px}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--amber)}
+h1{font-size:clamp(2.6rem,7vw,4.9rem);font-weight:800;margin:18px 0 10px}
+h1 .accent{color:var(--cyan)}
+.sub{font-size:clamp(1.05rem,2vw,1.3rem);color:var(--slate);max-width:640px}
+.sub b{color:var(--fog);font-weight:600}
+.reveal-line{display:block;overflow:hidden}
+.reveal-line span{display:block;transform:translateY(110%);animation:riseUp 1s var(--ease) forwards}
+.reveal-line:nth-child(2) span{animation-delay:.12s}
+@keyframes riseUp{to{transform:translateY(0)}}
+.fade-in{opacity:0;animation:fadeIn .9s var(--ease) forwards}
+.d1{animation-delay:.35s}.d2{animation-delay:.55s}.d3{animation-delay:.75s}.d4{animation-delay:.95s}
+@keyframes fadeIn{to{opacity:1}}
+.hero-ctas{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:14px;padding:12px 22px;border-radius:10px;border:1px solid var(--line);color:var(--fog);transition:transform .25s var(--ease),border-color .25s,background .25s;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{transform:translateY(-2px);border-color:var(--cyan);text-decoration:none}
+.btn.primary{background:var(--cyan);border-color:var(--cyan);color:var(--ink);font-weight:600}
+.btn.primary:hover{box-shadow:0 5px 14px rgba(102,195,218,.2)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:52px}
+.kpi{background:var(--ink-2);padding:20px 22px;transition:background .3s}
+.kpi:hover{background:var(--ink-3)}
+.kpi .num{font-family:var(--mono);font-size:clamp(1.4rem,3vw,1.9rem);font-weight:600;color:var(--cyan)}
+.kpi:nth-child(even) .num{color:var(--amber)}
+.kpi .lbl{font-size:12.5px;color:var(--slate);margin-top:4px;letter-spacing:.02em}
+@media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}}
+#funnelCanvas{position:absolute;inset:0;z-index:-1;opacity:.55}
+.scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--slate);font-family:var(--mono);font-size:12px;letter-spacing:.15em;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+
+/* ---------- sections ---------- */
+section{padding:110px 0;position:relative}
+.sec-head{margin-bottom:56px;max-width:720px}
+.sec-eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
+.sec-eyebrow::before{content:"";width:26px;height:1px;background:var(--cyan)}
+h2{font-size:clamp(1.9rem,4.4vw,2.9rem);font-weight:700;margin:16px 0 14px}
+.gh-head{display:flex;align-items:center}
+.gh-link{display:inline-flex;align-items:center;gap:16px;color:var(--fog)}
+.gh-link:hover{text-decoration:none;color:var(--cyan)}
+.gh-logo{width:.85em;height:.85em;flex:none;transition:transform .5s var(--ease)}
+.gh-link:hover .gh-logo{transform:rotate(360deg)}
+.gh-arrow{font-size:.5em;color:var(--slate);transition:transform .3s var(--ease),color .3s;margin-left:-4px}
+.gh-link:hover .gh-arrow{transform:translate(4px,-4px);color:var(--cyan)}
+.sec-head p{color:var(--slate);font-size:1.06rem}
+
+.io{opacity:0;transform:translateY(34px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.io.show{opacity:1;transform:none}
+.io.s1{transition-delay:.08s}.io.s2{transition-delay:.16s}.io.s3{transition-delay:.24s}.io.s4{transition-delay:.32s}
+
+/* ---------- loop pipeline ---------- */
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.stage{background:var(--ink-3);border:1px solid var(--line);border-radius:14px;padding:26px 22px;position:relative;transition:transform .35s var(--ease),border-color .35s,box-shadow .35s}
+.stage:hover{transform:translateY(-6px);border-color:var(--cyan);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.stage .glyph{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:var(--cyan-dim);margin-bottom:16px}
+.stage:nth-child(even) .glyph{background:var(--amber-dim)}
+.stage h3{font-size:1.06rem;margin-bottom:8px}
+.stage p{font-size:.92rem;color:var(--slate)}
+.stage::after{content:"";position:absolute;top:50%;right:-14px;width:14px;height:1px;background:var(--line)}
+.stage:last-child::after{display:none}
+@media(max-width:900px){.pipeline{grid-template-columns:repeat(2,1fr)}.stage::after{display:none}}
+@media(max-width:520px){.pipeline{grid-template-columns:1fr}}
+.flow-dot{position:absolute;top:50%;width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);opacity:0}
+
+/* ---------- case studies ---------- */
+.case{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:64px 0;border-top:1px solid var(--line)}
+.case:first-of-type{border-top:none;padding-top:0}
+.case.flip .case-viz{order:-1}
+@media(max-width:920px){.case{grid-template-columns:1fr;gap:34px}.case.flip .case-viz{order:0}}
+.case-tag{font-family:var(--mono);font-size:13.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;border-radius:999px;border:1px solid rgba(102,195,218,.45);color:var(--cyan);background:var(--cyan-dim);box-shadow:0 0 8px rgba(102,195,218,.08);display:inline-block;margin-bottom:18px}
+.case.amber .case-tag{border-color:rgba(227,154,106,.5);color:var(--amber);background:var(--amber-dim);box-shadow:0 0 8px rgba(227,154,106,.08)}
+.case h3{font-size:clamp(1.4rem,2.6vw,1.85rem);margin-bottom:14px}
+.case p{color:var(--slate);margin-bottom:14px}
+.case p b, .case li b{color:var(--fog);font-weight:600}
+.case ul{list-style:none;margin:18px 0}
+.case li{padding-left:22px;position:relative;color:var(--slate);margin-bottom:9px;font-size:.97rem}
+.case li::before{content:"";position:absolute;left:0;top:.55em;width:9px;height:9px;border-radius:2px;background:var(--cyan-dim);border:1px solid var(--cyan)}
+.case.amber li::before{background:var(--amber-dim);border-color:var(--amber)}
+.repo-link{font-family:var(--mono);font-size:14px;display:inline-flex;align-items:center;gap:8px;margin-top:6px}
+.repo-link svg{transition:transform .3s var(--ease)}
+.repo-link:hover svg{transform:translate(3px,-3px)}
+.case-viz{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;padding:30px 28px;position:relative;overflow:hidden}
+.case-viz::before{content:attr(data-title);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);display:block;margin-bottom:22px}
+.viz-note{font-size:12px;color:var(--slate);font-family:var(--mono);margin-top:18px}
+
+/* ---------- shared chart tooltip ---------- */
+#tip{position:fixed;z-index:90;pointer-events:none;background:#0A0F1C;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--fog);box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(6px) scale(.96);transition:opacity .2s var(--ease),transform .2s var(--ease);max-width:260px;white-space:pre-line}
+#tip.on{opacity:1;transform:translateY(0) scale(1)}
+#tip::after{content:"";position:absolute;left:50%;bottom:-5px;width:9px;height:9px;background:#0A0F1C;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+#tip.below::after{bottom:auto;top:-5px;transform:translateX(-50%) rotate(225deg)}
+#tip .t-hd{color:var(--cyan);font-weight:600;display:block;margin-bottom:2px}
+#tip.warm .t-hd{color:var(--amber)}
+
+/* metric morph (case 1) */
+.morph-wrap{display:flex;gap:28px;align-items:flex-end;height:230px;margin-bottom:8px}
+.morph-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:pointer}
+.morph-bar{width:100%;max-width:120px;border-radius:10px 10px 4px 4px;height:0;transition:height 1.4s var(--ease),filter .25s,box-shadow .25s}
+.morph-bar.event{background:linear-gradient(180deg,var(--amber),rgba(227,154,106,.25))}
+.morph-bar.session{background:linear-gradient(180deg,var(--cyan),rgba(102,195,218,.25))}
+.morph-col:hover .morph-bar{filter:brightness(1.3)}
+.morph-col:hover .morph-bar.event{box-shadow:0 0 12px rgba(227,154,106,.25)}
+.morph-col:hover .morph-bar.session{box-shadow:0 0 12px rgba(102,195,218,.25)}
+.morph-num{font-family:var(--mono);font-size:clamp(1.5rem,3vw,2rem);font-weight:600;margin-bottom:10px;transition:transform .25s var(--ease)}
+.morph-col:hover .morph-num{transform:scale(1.08)}
+.morph-lbl{font-size:12.5px;color:var(--slate);margin-top:12px;text-align:center;font-family:var(--mono)}
+.morph-col.event .morph-num{color:var(--amber)}
+.morph-col.session .morph-num{color:var(--cyan)}
+
+/* funnel + segment bars */
+.fun-row{display:grid;grid-template-columns:120px 1fr 54px;align-items:center;gap:14px;margin-bottom:16px;cursor:pointer;border-radius:8px;transition:background .2s}
+.fun-row:hover{background:rgba(255,255,255,.03)}
+.fun-lbl{font-family:var(--mono);font-size:12.5px;color:var(--slate);transition:color .2s}
+.fun-row:hover .fun-lbl{color:var(--fog)}
+.fun-track{height:30px;background:rgba(255,255,255,.04);border-radius:7px;overflow:hidden}
+.fun-fill{height:100%;width:0;border-radius:7px;background:linear-gradient(90deg,var(--amber),rgba(227,154,106,.4));transition:width 1.3s var(--ease),filter .25s}
+.fun-row:hover .fun-fill{filter:brightness(1.35) saturate(1.2)}
+.fun-val{font-family:var(--mono);font-size:14px;color:var(--fog);text-align:right}
+.seg-row{display:grid;grid-template-columns:110px 1fr 86px;align-items:center;gap:14px;margin-bottom:16px;cursor:pointer;border-radius:8px;transition:background .2s}
+.seg-row:hover{background:rgba(255,255,255,.03)}
+.seg-row:hover .fun-lbl{color:var(--fog)}
+.seg-fill{height:26px;width:0;border-radius:6px;transition:width 1.3s var(--ease),filter .25s}
+.seg-row:hover .seg-fill{filter:brightness(1.35) saturate(1.15)}
+.seg-1{background:linear-gradient(90deg,#2E3C5E,#3A4A73)}
+.seg-2{background:linear-gradient(90deg,#33608A,#3E76A8)}
+.seg-3{background:linear-gradient(90deg,#3E9AB8,#4FB6D4)}
+.seg-4{background:linear-gradient(90deg,var(--cyan),#A6DEEC)}
+.seg-val{font-family:var(--mono);font-size:13px;color:var(--fog);text-align:right}
+
+/* sparkline */
+.spark{margin-top:26px;position:relative}
+.spark svg{width:100%;height:96px;display:block;cursor:pointer}
+.spark path.line{fill:none;stroke:var(--cyan);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.spark path.area{fill:url(#sparkGrad);opacity:0}
+.spark circle.pt{fill:var(--cyan);opacity:0;transition:r .18s var(--ease)}
+.spark line.xhair{stroke:var(--slate);stroke-width:1;stroke-dasharray:3 4;opacity:0;transition:opacity .15s}
+.spark.play path.line{stroke-dasharray:600;stroke-dashoffset:600;animation:draw 2.2s var(--ease) forwards}
+.spark.play path.area{animation:fadeIn 1s .9s var(--ease) forwards}
+.spark.play circle.pt{animation:fadeIn .4s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.spark-cap{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--slate)}
+
+/* donut */
+.donut-row{display:flex;align-items:center;gap:26px;margin-top:26px}
+.donut{width:120px;height:120px;flex:none;cursor:pointer}
+.donut circle{fill:none;stroke-width:12;transition:stroke-width .25s var(--ease)}
+.donut:hover .fg{stroke-width:16}
+.donut .bg{stroke:rgba(255,255,255,.06)}
+.donut .fg{stroke:var(--amber);stroke-linecap:round;stroke-dasharray:0 999;transition:stroke-dasharray 1.6s var(--ease),stroke-width .25s var(--ease)}
+.donut text{font-family:var(--mono);font-size:19px;font-weight:600;fill:var(--amber)}
+.donut-cap{font-size:.92rem;color:var(--slate)}
+
+/* ---------- validation strip ---------- */
+.validate{background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:52px 46px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start}
+@media(max-width:880px){.validate{grid-template-columns:1fr;padding:36px 26px}}
+.validate h2{font-size:clamp(1.5rem,3vw,2.1rem)}
+.validate p{color:var(--slate)}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+@media(max-width:520px){.ai-grid{grid-template-columns:1fr}}
+.ai-item{border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;transition:transform .3s var(--ease),border-color .3s,background .3s;display:flex;flex-direction:column;gap:3px;background:transparent;font:inherit;text-align:left;color:inherit}
+.ai-item:hover{transform:translateY(-3px);border-color:var(--cyan);background:var(--cyan-dim)}
+.ai-item:nth-child(even):hover{border-color:var(--amber);background:var(--amber-dim)}
+.ai-item.active{border-color:var(--cyan);background:var(--cyan-dim);box-shadow:0 0 10px rgba(102,195,218,.12)}
+.ai-item:nth-child(even).active{border-color:var(--amber);background:var(--amber-dim);box-shadow:0 0 10px rgba(227,154,106,.12)}
+.ai-item:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.ai-k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
+.ai-v{font-size:.95rem;color:var(--fog);font-weight:500}
+.ai-hint{font-family:var(--mono);font-size:12px;color:var(--slate);margin-top:12px}
+.term-title{font-family:var(--mono);font-size:11px;color:var(--slate);margin-left:8px;letter-spacing:.06em}
+.term{background:#0A0F1C;border:1px solid var(--line);border-radius:12px;font-family:var(--mono);font-size:13px;overflow:hidden}
+.term-bar{display:flex;gap:6px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.term-bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.term-body{padding:18px 18px 22px;line-height:1.9;min-height:190px;color:#B9C4DC;white-space:pre-wrap}
+.term-body .ok{color:var(--cyan)}
+.term-body .warn{color:var(--amber)}
+.caret{display:inline-block;width:8px;height:15px;background:var(--cyan);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:start}
+@media(max-width:880px){.about-grid{grid-template-columns:1fr}}
+.about p{color:var(--slate);margin-bottom:16px}
+.about p b{color:var(--fog)}
+.stack{background:var(--ink-3);border:1px solid var(--line);border-radius:16px;padding:26px}
+.stack h3{font-size:.95rem;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:18px}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:26px}
+.chip{font-family:var(--mono);font-size:12.5px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--fog);transition:border-color .25s,transform .25s var(--ease),background .25s}
+.chip:hover{border-color:var(--cyan);transform:translateY(-2px);background:var(--cyan-dim)}
+.chips.amber .chip:hover{border-color:var(--amber);background:var(--amber-dim)}
+
+/* ---------- contact ---------- */
+.contact{text-align:center;padding-bottom:60px}
+.contact h2{font-size:clamp(2rem,5vw,3.2rem)}
+.big-mail{font-family:var(--mono);font-size:clamp(1.05rem,3.4vw,1.7rem);display:inline-block;margin:22px 0 30px;position:relative}
+.big-mail::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:100%;background:linear-gradient(90deg,var(--cyan),var(--amber));transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.big-mail:hover{text-decoration:none}
+.big-mail:hover::after{transform:scaleX(1)}
+.contact-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--slate);font-size:13px;font-family:var(--mono)}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important;animation-delay:0s!important;transition-delay:0s!important}
+  .io{opacity:1;transform:none}
+  #funnelCanvas{display:none}
+  .reveal-line span{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="backdrop"></div>
+<div id="progress"></div>
+<div id="tip" role="tooltip"></div>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="logo" href="#top">christian<b>@</b>lomboto <span style="color:var(--slate)">~/analytics</span></a>
+    <div class="nav-links">
+      <a href="#work">Case studies</a>
+      <a href="#validation">AI</a>
+      <a href="#about">About</a>
+      <a class="nav-cta" href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
+  <canvas id="funnelCanvas" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="eyebrow fade-in">Galway, Ireland · Product &amp; UX Analytics</p>
+    <h1>
+      <span class="reveal-line"><span>I turn what users <em class="accent" style="font-style:normal">actually do</em></span></span>
+      <span class="reveal-line"><span>into metrics teams can trust.</span></span>
+    </h1>
+    <p class="sub fade-in d1">Data analyst working with <b>event-level product data</b>. I instrument websites with <b>Contentsquare</b>, analyse behaviour in <b>Snowflake SQL</b> and <b>Python</b>, and build <b>dashboards</b> where every number has a written definition and can be traced back to source.</p>
+    <div class="hero-ctas fade-in d2">
+      <a class="btn primary" href="#work">View case studies ↓</a>
+      <a class="btn" href="cv/Christian_Lomboto_CV.pdf" download>Download CV</a>
+      <a class="btn" href="https://github.com/lomboto05-commits" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <div class="kpis fade-in d3">
+      <div class="kpi"><div class="num" data-count="884474" data-format="int">0</div><div class="lbl">e-commerce events analysed in Snowflake</div></div>
+      <div class="kpi"><div class="num" data-count="50.31" data-format="pct">0%</div><div class="lbl">session-level cart to purchase rate, checked two ways</div></div>
+      <div class="kpi"><div class="num" data-count="4" data-format="int">0</div><div class="lbl">funnel stages instrumented and mapped in Contentsquare</div></div>
+      <div class="kpi"><div class="num" data-count="99.4" data-format="pct">0%</div><div class="lbl">measured accuracy across 2 yrs of financial data QA</div></div>
+    </div>
+  </div>
+  <div class="scroll-hint fade-in d4">SCROLL ▾</div>
+</header>
+
+<!-- ================= LOOP ================= -->
+<section id="loop">
+  <div class="wrap">
+    <div class="sec-head io">
+      <p class="sec-eyebrow">How I work</p>
+      <h2>Instrument → Measure → Validate → Explain</h2>
+      <p>Product decisions should be based on what users actually do, not on guesswork. Each project below runs this loop end to end.</p>
+    </div>
+    <div class="pipeline io s1" id="pipeline">
+      <div class="stage">
+        <div class="glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#66C3DA" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></div>
+        <h3>Instrument</h3>
+        <p>Set up tracking that reflects real behaviour: tag deployment, event definitions and page-group mapping, kept accurate as the product changes.</p>
+      </div>
+      <div class="stage">
+        <div class="glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E39A6A" stroke-width="2"><path d="M3 20h18M6 16v-5M11 16V7M16 16v-8M21 16V4"/></svg></div>
+        <h3>Measure</h3>
+        <p>Work at the level of individual user actions: sessionisation, funnels and journeys, in SQL over cloud warehouses and in Python.</p>
+      </div>
+      <div class="stage">
+        <div class="glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#66C3DA" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h3>Validate</h3>
+        <p>Reconcile against known baselines, compute the same answer two independent ways, and chase discrepancies to root cause. This includes AI-generated output.</p>
+      </div>
+      <div class="stage">
+        <div class="glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E39A6A" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <h3>Explain</h3>
+        <p>Dashboards people rely on, definitions written down, and findings presented clearly to technical and non-technical audiences.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CASE STUDIES ================= -->
+<section id="work" style="padding-top:60px">
+  <div class="wrap">
+    <div class="sec-head io">
+      <p class="sec-eyebrow">Case studies</p>
+      <h2 class="gh-head"><a href="https://github.com/lomboto05-commits" target="_blank" rel="noopener" class="gh-link"><svg class="gh-logo" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>On GitHub<span class="gh-arrow">↗</span></a></h2>
+      <p>The charts below use the actual numbers from each project. Hover over any bar or point for the detail. Each project links to its repository, where the SQL, notebooks and source exports are versioned.</p>
+    </div>
+
+    <!-- Case 1 -->
+    <div class="case io">
+      <div class="case-body">
+        <span class="case-tag">Snowflake · SQL · Power BI</span>
+        <h3>Same data, two answers: why metric definitions matter</h3>
+        <p>884,474 e-commerce events analysed through a layered RAW to CLEANED pipeline in Snowflake, ending in a Power BI dashboard. The most important result wasn't a number, it was a <b>definition</b>.</p>
+        <ul>
+          <li>A simple event-count conversion rate gave <b>69.11%</b>. A <b>session-level funnel</b> (CTE with conditional aggregation) gave <b>50.31%</b>, nearly 19 points lower.</li>
+          <li>Checked the 50.31% with a <b>second, independent method</b> (LEFT JOIN of cart sessions to purchase sessions). Both methods agree.</li>
+          <li>Reconciled dashboard revenue to <b>€5.13M</b> by filtering every visual to purchase events only. The reconciliation query is committed in the repo.</li>
+          <li>Data quality first: NULL audits, duplicate detection, price and timestamp validation before any analysis ran.</li>
+        </ul>
+        <a class="repo-link" href="https://github.com/lomboto05-commits/E-commerce-user-behavior-snowflake" target="_blank" rel="noopener">View SQL &amp; dashboard on GitHub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="case-viz" data-title="Cart to purchase conversion · two definitions" id="morphViz">
+        <div class="morph-wrap">
+          <div class="morph-col event" data-tip="Event-level rate|Counts every purchase event against every cart event across all 884,474 rows. No session grouping, so repeated events inflate it.|Result: 69.11%">
+            <div class="morph-num" data-count="69.11" data-format="pct">0%</div>
+            <div class="morph-bar event" data-h="69.11"></div>
+            <div class="morph-lbl">event-level<br>(purchases ÷ cart events)</div>
+          </div>
+          <div class="morph-col session" data-tip="Session-level rate|Of sessions that contained a cart event, the share that also contained a purchase. One flag per session.|Result: 50.31%, validated by two independent queries">
+            <div class="morph-num" data-count="50.31" data-format="pct">0%</div>
+            <div class="morph-bar session" data-h="50.31"></div>
+            <div class="morph-lbl">session-level<br>(cart sessions that purchased)</div>
+          </div>
+        </div>
+        <p class="viz-note">The 18.8 point gap comes from the aggregation level alone. The session-level figure is the one reported.</p>
+      </div>
+    </div>
+
+    <!-- Case 2 -->
+    <div class="case flip amber io">
+      <div class="case-viz" data-title="Live storefront funnel · Contentsquare page groups" id="funnelViz">
+        <div class="fun-row" data-tip="Homepage|7 of 7 sessions started here|Step conversion: 100%" data-warm="1"><span class="fun-lbl">Homepage</span><div class="fun-track"><div class="fun-fill" data-w="100"></div></div><span class="fun-val" data-count="7" data-format="int">0</span></div>
+        <div class="fun-row" data-tip="Product Listing Pages|5 of 7 sessions reached this step. 2 dropped off after the Homepage.|Step conversion: 71.4%" data-warm="1"><span class="fun-lbl">Product Listing</span><div class="fun-track"><div class="fun-fill" data-w="71.4"></div></div><span class="fun-val" data-count="5" data-format="int">0</span></div>
+        <div class="fun-row" data-tip="Product Detail Pages|All 5 sessions from the previous step continued.|Step conversion: 100%" data-warm="1"><span class="fun-lbl">Product Detail</span><div class="fun-track"><div class="fun-fill" data-w="71.4"></div></div><span class="fun-val" data-count="5" data-format="int">0</span></div>
+        <div class="fun-row" data-tip="Cart|2 of 5 sessions reached the cart. 3 dropped off: the largest drop in the funnel (60%).|Step conversion: 40%" data-warm="1"><span class="fun-lbl">Cart</span><div class="fun-track"><div class="fun-fill" data-w="28.6"></div></div><span class="fun-val" data-count="2" data-format="int">0</span></div>
+        <div class="spark" id="spark">
+          <svg viewBox="0 0 560 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#66C3DA" stop-opacity=".28"/><stop offset="1" stop-color="#66C3DA" stop-opacity="0"/></linearGradient></defs>
+            <path class="area" d=""></path>
+            <path class="line" d=""></path>
+            <line class="xhair" y1="6" y2="94"></line>
+            <rect class="hitbox" x="0" y="0" width="560" height="100" fill="transparent"></rect>
+          </svg>
+          <div class="spark-cap"><span>daily sessions · hover for detail</span><span>one-week observation window</span></div>
+        </div>
+        <p class="viz-note">Sample: 7 sessions, 120 page views. Reported as directional, with the limitations written down.</p>
+      </div>
+      <div class="case-body">
+        <span class="case-tag">Contentsquare · Instrumentation · Python</span>
+        <h3>Instrumenting a live storefront, then fixing my own tracking</h3>
+        <p>To get real setup experience I deployed an open-source storefront, added the Contentsquare tag, and analysed the telemetry in Python. The most useful part was finding and fixing a problem in my own setup:</p>
+        <ul>
+          <li>Journey analysis surfaced an <b>unresolved page label</b>, caused by a gap in the page-name mapping. I traced the cause, configured <b>page groups</b> for Homepage, Listing, Detail and Cart, and measured again.</li>
+          <li>Built the resulting 4-stage funnel. The largest drop-off is at the <b>Product Detail to Cart</b> step (60%).</li>
+          <li>Made the analysis reproducible: label-based extraction from exports instead of fixed cell positions, with the source exports committed to the repo.</li>
+          <li>Every percentage is reported with its <b>sample size</b>. Seven sessions is a small sample, and the write-up says so.</li>
+        </ul>
+        <a class="repo-link" style="color:var(--amber)" href="https://github.com/lomboto05-commits/contentsquare-website-analytics" target="_blank" rel="noopener">View notebook &amp; exports on GitHub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+      </div>
+    </div>
+
+    <!-- Case 3 -->
+    <div class="case io">
+      <div class="case-body">
+        <span class="case-tag">Python · Pandas · Segmentation</span>
+        <h3>Customer value segmentation on 3,660 transactions</h3>
+        <p>Exploratory analysis of e-commerce transactions in Pandas: spend distribution, quartile value segments, and category, payment, pricing and discount behaviour.</p>
+        <ul>
+          <li>Quartile segmentation shows the <b>top-value quarter</b> of customers generating <b>45%</b> of total revenue, which makes the case for targeted retention.</li>
+          <li>Relationships that are true by arithmetic (price against final price) were used as <b>data checks</b>, not presented as findings.</li>
+          <li>Limitations are stated plainly: one transaction per customer means retention can't be measured, so it isn't claimed.</li>
+        </ul>
+        <a class="repo-link" href="https://github.com/lomboto05-commits/eCommerce-customer-analytics" target="_blank" rel="noopener">View analysis on GitHub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="case-viz" data-title="Revenue by customer value segment (quartiles of 915)" id="segViz">
+        <div class="seg-row" data-tip="Low value · 915 customers|Avg spend Rs 54.73|Revenue Rs 50,071 (6.6% of total)"><span class="fun-lbl">Low value</span><div class="fun-track" style="height:26px"><div class="seg-fill seg-1" data-w="14.7"></div></div><span class="seg-val">Rs 50.1K</span></div>
+        <div class="seg-row" data-tip="Mid-low value · 915 customers|Avg spend Rs 151.42|Revenue Rs 138,553 (18.3% of total)"><span class="fun-lbl">Mid-low</span><div class="fun-track" style="height:26px"><div class="seg-fill seg-2" data-w="40.6"></div></div><span class="seg-val">Rs 138.6K</span></div>
+        <div class="seg-row" data-tip="Mid-high value · 915 customers|Avg spend Rs 248.85|Revenue Rs 227,693 (30.1% of total)"><span class="fun-lbl">Mid-high</span><div class="fun-track" style="height:26px"><div class="seg-fill seg-3" data-w="66.8"></div></div><span class="seg-val">Rs 227.7K</span></div>
+        <div class="seg-row" data-tip="High value · 915 customers|Avg spend Rs 372.63|Revenue Rs 340,961 (45.0% of total)"><span class="fun-lbl">High value</span><div class="fun-track" style="height:26px"><div class="seg-fill seg-4" data-w="100"></div></div><span class="seg-val">Rs 341.0K</span></div>
+        <div class="donut-row">
+          <svg class="donut" viewBox="0 0 100 100" data-tip="Top quartile share|Rs 340,961 of Rs 757,278 total revenue|Same headcount as every other segment (915 customers)" data-warm="1">
+            <circle class="bg" cx="50" cy="50" r="40"/>
+            <circle class="fg" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" data-pct="45"/>
+            <text x="50" y="56" text-anchor="middle">45%</text>
+          </svg>
+          <p class="donut-cap">45% of revenue comes from the top quartile of customers. The four segments are the same size, so the value difference is real.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VALIDATION ================= -->
+<section id="validation">
+  <div class="wrap">
+    <div class="validate io">
+      <div>
+        <p class="sec-eyebrow" style="margin-bottom:14px">AI-assisted analytics</p>
+        <h2>I use AI in my work, and I verify everything it produces.</h2>
+        <p style="margin-top:14px">Every one of my repositories states where AI assistance was used, because generated output is a draft, not an answer. Before anything I produce reaches someone else, I read the SQL for grain and join logic, reconcile totals against a known baseline, and where it matters, compute the same answer a second independent way. That review step is how a 69.11% "conversion rate" became a defensible 50.31%.</p>
+        <div class="ai-grid" id="aiGrid" role="tablist" aria-label="AI practices">
+          <button class="ai-item" data-view="agentic" role="tab">
+            <span class="ai-k">Agentic tools</span>
+            <span class="ai-v">Claude Code · Codex</span>
+          </button>
+          <button class="ai-item" data-view="context" role="tab">
+            <span class="ai-k">Context discipline</span>
+            <span class="ai-v">Token &amp; context management</span>
+          </button>
+          <button class="ai-item" data-view="skills" role="tab">
+            <span class="ai-k">Skill development</span>
+            <span class="ai-v">Versioned, reusable methods</span>
+          </button>
+          <button class="ai-item" data-view="mcp" role="tab">
+            <span class="ai-k">Connectors</span>
+            <span class="ai-v">MCP · Snowflake · GitHub</span>
+          </button>
+        </div>
+        <p class="ai-hint">Click a card to see it in the terminal →</p>
+        <p style="margin-top:22px">I've written this method up as a reusable skill: a versioned instruction file with runnable SQL, a Python export-QA module and MCP setup, so an agent (or a colleague) can follow the same validation loop I do.</p>
+        <a class="repo-link" href="https://github.com/lomboto05-commits/analytics-skills/blob/main/ux-analytics-validation/SKILL.md" target="_blank" rel="noopener">Read the skill: ux-analytics-validation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="term" aria-hidden="true">
+        <div class="term-bar"><i></i><i></i><i></i><span class="term-title" id="termTitle">validate.log</span></div>
+        <div class="term-body" id="termBody"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head io">
+      <p class="sec-eyebrow">About</p>
+      <h2>Ten years running my own business, then a career change into data.</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about io s1">
+        <p>Before data, I was a self-employed barber for a decade. That work is where I learned to <b>listen for what someone actually needs, which is not always what they first ask for</b>, and to keep their trust when I disagree with them. Those habits carry straight into working with stakeholders.</p>
+        <p>The change took two qualifications back to back, a Level 7 in software development and then a Level 8 Higher Diploma in Data Analytics, completed while working. Since 2024 I've been a financial data analyst at Infosys BPM, doing data quality on mutual fund and ETF data where mistakes have real consequences: cleansing, metadata validation, reconciliation against source, and chasing every discrepancy to root cause, at a <b>measured 99.4% accuracy average with regular 100% weeks</b>.</p>
+        <p>The projects on this page are how I built product analytics experience deliberately. Not tutorials: a real instrumented site, a real cloud warehouse, and dashboards whose numbers I can defend line by line. <b>Fluent in English and French.</b></p>
+      </div>
+      <div class="stack io s2">
+        <h3>Warehouse &amp; SQL</h3>
+        <div class="chips"><span class="chip">Snowflake</span><span class="chip">CTEs</span><span class="chip">Window functions</span><span class="chip">Joins at scale</span><span class="chip">MySQL</span></div>
+        <h3>Product analytics</h3>
+        <div class="chips amber"><span class="chip">Contentsquare</span><span class="chip">Journey analysis</span><span class="chip">Sessionisation</span><span class="chip">Funnels</span><span class="chip">Tracking taxonomy</span></div>
+        <h3>Analysis &amp; reporting</h3>
+        <div class="chips"><span class="chip">Python · Pandas</span><span class="chip">Power BI</span><span class="chip">Matplotlib</span><span class="chip">Excel</span><span class="chip">Metric definitions</span></div>
+        <h3>Quality</h3>
+        <div class="chips amber"><span class="chip">Reconciliation</span><span class="chip">Root-cause analysis</span><span class="chip">AI output review</span><span class="chip">Git / GitHub</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="contact">
+  <div class="wrap io">
+    <p class="sec-eyebrow" style="justify-content:center">Contact</p>
+    <h2>Get in touch</h2>
+    <a class="big-mail" href="mailto:contact@christianlomboto.ie">contact@christianlomboto.ie</a>
+    <div class="contact-links">
+      <a class="btn" href="https://www.linkedin.com/in/christian-lomboto-085977131" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="https://github.com/lomboto05-commits" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn primary" href="cv/Christian_Lomboto_CV.pdf" download>Download CV (PDF)</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="yr"></span> Christian Lomboto · Galway, Ireland</span>
+    <span>all metrics on this page come from the linked repositories</span>
+  </div>
+</footer>
+
+<script>
+/* ============ helpers ============ */
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* progress + nav */
+const nav = document.getElementById('nav'), prog = document.getElementById('progress');
+addEventListener('scroll', () => {
+  const h = document.documentElement;
+  prog.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+  nav.classList.toggle('scrolled', h.scrollTop > 30);
+}, {passive:true});
+
+/* ============ shared tooltip ============ */
+const tip = document.getElementById('tip');
+function tipHTML(raw){
+  const parts = raw.split('|');
+  return '<span class="t-hd">' + parts[0] + '</span>' + parts.slice(1).join('\n');
+}
+/* Pop the tooltip centered over an anchor point (cx = horizontal center, topY/bottomY = element edges) */
+function popTip(text, cx, topY, bottomY, warm){
+  tip.innerHTML = tipHTML(text);
+  tip.classList.toggle('warm', !!warm);
+  tip.style.left = '0px'; tip.style.top = '0px'; /* reset so measurement is clean */
+  const r = tip.getBoundingClientRect();
+  let left = cx - r.width / 2;
+  left = Math.max(12, Math.min(left, innerWidth - r.width - 12));
+  let top = topY - r.height - 12;
+  const below = top < 12;
+  if (below) top = bottomY + 12;
+  tip.classList.toggle('below', below);
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+  tip.classList.add('on');
+}
+function popTipOver(el, text, warm){
+  const b = el.getBoundingClientRect();
+  popTip(text, b.left + b.width / 2, b.top, b.bottom, warm);
+}
+function hideTip(){ tip.classList.remove('on'); }
+document.querySelectorAll('[data-tip]').forEach(el => {
+  el.addEventListener('mouseenter', () => popTipOver(el, el.dataset.tip, el.dataset.warm));
+  el.addEventListener('mouseleave', hideTip);
+  /* tap support on touch screens */
+  el.addEventListener('click', () => {
+    if (matchMedia('(hover: hover)').matches) return;
+    popTipOver(el, el.dataset.tip, el.dataset.warm);
+    setTimeout(hideTip, 2600);
+  });
+});
+addEventListener('scroll', hideTip, {passive:true});
+
+/* ============ count-up ============ */
+function countUp(el){
+  const target = parseFloat(el.dataset.count), fmt = el.dataset.format;
+  const dur = 1600, t0 = performance.now();
+  function frame(t){
+    const p = Math.min((t - t0) / dur, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    const v = target * e;
+    el.textContent = fmt === 'pct' ? v.toFixed(2) + '%' : Math.round(v).toLocaleString('en-IE');
+    if (p < 1) requestAnimationFrame(frame);
+    else el.textContent = fmt === 'pct' ? target.toFixed(2) + '%' : target.toLocaleString('en-IE');
+  }
+  if (reduced) { el.textContent = fmt === 'pct' ? target.toFixed(2)+'%' : target.toLocaleString('en-IE'); return; }
+  requestAnimationFrame(frame);
+}
+
+/* ============ IntersectionObserver reveals ============ */
+const seen = new WeakSet();
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (!en.isIntersecting || seen.has(en.target)) return;
+    seen.add(en.target);
+    en.target.classList.add('show');
+    en.target.querySelectorAll('[data-count]').forEach(countUp);
+    en.target.querySelectorAll('.morph-bar').forEach(b => { b.style.height = (b.dataset.h * 2.1) + 'px'; });
+    en.target.querySelectorAll('.fun-fill,.seg-fill').forEach((f,i) => setTimeout(() => f.style.width = f.dataset.w + '%', i * 140));
+    const d = en.target.querySelector('.donut .fg');
+    if (d) { const c = 2 * Math.PI * 40; setTimeout(()=> d.style.strokeDasharray = (d.dataset.pct/100*c) + ' ' + c, 300); }
+    const sp = en.target.querySelector('.spark') || (en.target.classList.contains('spark') ? en.target : null);
+    if (sp) sp.classList.add('play');
+    if (en.target.id === 'pipeline' && !reduced) launchPipelineDots(en.target);
+    if (en.target.querySelector && en.target.querySelector('#termBody')) typeTerminal();
+  });
+}, {threshold: .25});
+document.querySelectorAll('.io, .case-viz').forEach(el => io.observe(el));
+addEventListener('load', () => document.querySelectorAll('.kpis [data-count]').forEach(countUp));
+
+/* ============ interactive sparkline (real daily sessions) ============ */
+(function(){
+  const data = [0,0,0,2,1,4,0];
+  const labels = ['Sun 9 Aug','Mon 10 Aug','Tue 11 Aug','Wed 12 Aug','Thu 13 Aug','Fri 14 Aug','Sat 15 Aug'];
+  const W = 560, H = 100, pad = 10, maxV = 4;
+  const x = i => pad + i * (W - 2*pad) / (data.length - 1);
+  const y = v => H - pad - v * (H - 2*pad) / maxV;
+  let dLine = '';
+  data.forEach((v,i) => { dLine += (i ? ' L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); });
+  const svg = document.querySelector('#spark svg');
+  const xhair = svg.querySelector('.xhair');
+  svg.querySelector('.line').setAttribute('d', dLine);
+  svg.querySelector('.area').setAttribute('d', dLine + ` L${x(data.length-1)} ${H-pad} L${x(0)} ${H-pad} Z`);
+  const pts = data.map((v,i) => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('class','pt');
+    c.setAttribute('cx', x(i)); c.setAttribute('cy', y(v)); c.setAttribute('r', 3.2);
+    c.style.animationDelay = (0.9 + i*0.15) + 's';
+    svg.insertBefore(c, svg.querySelector('.hitbox'));
+    return c;
+  });
+  let hot = -1;
+  function svgX(e){
+    const r = svg.getBoundingClientRect();
+    return (e.clientX - r.left) / r.width * W;
+  }
+  svg.addEventListener('mousemove', e => {
+    const mx = svgX(e);
+    let best = 0, bd = 1e9;
+    data.forEach((_,i) => { const d = Math.abs(x(i) - mx); if (d < bd){ bd = d; best = i; } });
+    if (best === hot) return; /* tooltip stays anchored to the point until the point changes */
+    if (hot >= 0) pts[hot].setAttribute('r', 3.2);
+    hot = best;
+    pts[hot].setAttribute('r', 6);
+    xhair.setAttribute('x1', x(hot)); xhair.setAttribute('x2', x(hot));
+    xhair.style.opacity = .8;
+    const s = data[hot];
+    const pb = pts[hot].getBoundingClientRect();
+    popTip(labels[hot] + '|' + s + ' session' + (s === 1 ? '' : 's') + ' recorded',
+           pb.left + pb.width / 2, pb.top, pb.bottom, false);
+  });
+  svg.addEventListener('mouseleave', () => {
+    if (hot >= 0) pts[hot].setAttribute('r', 3.2);
+    hot = -1; xhair.style.opacity = 0; hideTip();
+  });
+})();
+
+/* ============ pipeline flow dots ============ */
+function launchPipelineDots(pipe){
+  const stages = pipe.querySelectorAll('.stage');
+  if (stages.length < 2 || getComputedStyle(stages[0], '::after').display === 'none') return;
+  setInterval(() => {
+    const i = Math.floor(Math.random() * (stages.length - 1));
+    const s = stages[i], dot = document.createElement('span');
+    dot.className = 'flow-dot';
+    s.appendChild(dot);
+    dot.animate([
+      {right:'-2px', opacity:0},
+      {right:'-7px', opacity:1, offset:.3},
+      {right:'-16px', opacity:0}
+    ], {duration:900, easing:'ease-in-out'}).onfinish = () => dot.remove();
+  }, 700);
+}
+
+/* ============ terminal: multiple sessions, switched by the AI cards ============ */
+const termSessions = {
+  validate: { title: 'validate.log', lines: [
+    {t:'$ validate metric "cart_to_purchase"', c:''},
+    {t:'  method 1 · CTE + conditional aggregation ... 50.31%', c:'ok'},
+    {t:'  method 2 · LEFT JOIN cart to purchase sessions ... 50.31%', c:'ok'},
+    {t:'  reconcile revenue vs baseline ... €5.13M ✓ ties', c:'ok'},
+    {t:'  naive event-level figure ... 69.11%  rejected: wrong grain', c:'warn'},
+    {t:'$ ship it', c:''}
+  ]},
+  agentic: { title: 'claude-code.log', lines: [
+    {t:'$ claude "add a session-level funnel to the repo"', c:''},
+    {t:'  plan: sql/05_funnel_analysis.sql · 2 queries drafted', c:''},
+    {t:'$ review diff, every line', c:''},
+    {t:'  grain ✓  join keys ✓  NULLIF on denominator ✓', c:'ok'},
+    {t:'$ run both against Snowflake ... 50.31% = 50.31%', c:'ok'},
+    {t:'$ git commit -m "Add dual-method session funnel"', c:''}
+  ]},
+  context: { title: 'context.log', lines: [
+    {t:'$ context status', c:''},
+    {t:'  in scope: EVENTS_CLEAN_FINAL · 2 SQL files · 1 notebook', c:'ok'},
+    {t:'  out of scope: everything else', c:''},
+    {t:'  prompt: the question + the schema, no pasted dumps', c:'ok'},
+    {t:'$ new task', c:''},
+    {t:'  new session · long chats drift, fresh context stays sharp', c:'warn'}
+  ]},
+  skills: { title: 'SKILL.md', lines: [
+    {t:'$ cat skills/ux-analytics-validation/SKILL.md', c:''},
+    {t:'  1 grain check        2 dual-method validation', c:'ok'},
+    {t:'  3 reconcile baseline 4 NULL / dupe / boundary checks', c:'ok'},
+    {t:'  5 report every n     6 write the definition down', c:'ok'},
+    {t:'$ git log SKILL.md', c:''},
+    {t:'  the method is versioned, same as the code', c:''}
+  ]},
+  mcp: { title: 'mcp.log', lines: [
+    {t:'$ mcp list', c:''},
+    {t:'  snowflake ✓   github ✓   filesystem ✓', c:'ok'},
+    {t:'$ run funnel_validation.sql via snowflake mcp', c:''},
+    {t:'  method 1 ... 50.31% · method 2 ... 50.31% ✓', c:'ok'},
+    {t:'  definitions read from the repo, not from memory', c:''},
+    {t:'$ the agent validates where the data lives', c:''}
+  ]}
+};
+let termRun = 0, termStarted = false;
+function typeSession(key){
+  const body = document.getElementById('termBody');
+  const title = document.getElementById('termTitle');
+  const s = termSessions[key];
+  title.textContent = s.title;
+  const run = ++termRun;
+  body.innerHTML = '';
+  if (reduced){
+    body.innerHTML = s.lines.map(l=>`<span class="${l.c}">${l.t}</span>`).join('\n') + ' <span class="caret"></span>';
+    return;
+  }
+  let li = 0, ci = 0;
+  (function tick(){
+    if (run !== termRun) return; /* a newer session started; stop this one */
+    if (li >= s.lines.length){ body.innerHTML += ' <span class="caret"></span>'; return; }
+    const line = s.lines[li];
+    if (ci === 0 && li > 0) body.innerHTML += '\n';
+    if (ci === 0) body.innerHTML += `<span class="${line.c}"></span>`;
+    const spans = body.querySelectorAll('span');
+    spans[spans.length-1].textContent = line.t.slice(0, ++ci);
+    if (ci >= line.t.length){ li++; ci = 0; setTimeout(tick, 300); }
+    else setTimeout(tick, 13 + Math.random()*20);
+  })();
+}
+function typeTerminal(){
+  if (termStarted) return; termStarted = true;
+  typeSession('validate');
+}
+document.querySelectorAll('#aiGrid .ai-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#aiGrid .ai-item').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
+    termStarted = true;
+    typeSession(btn.dataset.view);
+  });
+});
+
+/* ============ hero canvas: session dots through funnel gates ============ */
+(function(){
+  if (reduced) return;
+  const cv = document.getElementById('funnelCanvas'), ctx = cv.getContext('2d');
+  let W, H, gates, dots = [];
+  const CYAN = '#66C3DA', AMBER = '#E39A6A';
+  function size(){
+    W = cv.width = cv.offsetWidth * devicePixelRatio;
+    H = cv.height = cv.offsetHeight * devicePixelRatio;
+    gates = [0.30, 0.48, 0.66, 0.84].map((gx,i)=>({ x: gx*W, pass:[1, .714, 1, .40][i] }));
+  }
+  size(); addEventListener('resize', size);
+  function spawn(){
+    dots.push({
+      x: -10, y: H*0.25 + Math.random()*H*0.55,
+      v: (1.1 + Math.random()*0.9) * devicePixelRatio,
+      r: (1.2 + Math.random()*1.6) * devicePixelRatio,
+      gi: 0, drop: false, dy: 0, a: 0.9
+    });
+  }
+  setInterval(spawn, 260);
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle = 'rgba(36,48,81,.9)';
+    ctx.lineWidth = devicePixelRatio;
+    ctx.setLineDash([4*devicePixelRatio, 7*devicePixelRatio]);
+    gates.forEach(g => { ctx.beginPath(); ctx.moveTo(g.x, H*0.12); ctx.lineTo(g.x, H*0.92); ctx.stroke(); });
+    ctx.setLineDash([]);
+    dots = dots.filter(d => d.x < W + 20 && d.a > 0.02);
+    dots.forEach(d => {
+      d.x += d.v;
+      if (d.drop){ d.dy += 0.06*devicePixelRatio; d.y += d.dy; d.a *= 0.975; }
+      else if (d.gi < gates.length && d.x >= gates[d.gi].x){
+        if (Math.random() > gates[d.gi].pass){ d.drop = true; }
+        d.gi++;
+      }
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, 7);
+      ctx.fillStyle = d.drop ? AMBER : CYAN;
+      ctx.globalAlpha = d.a * (d.drop ? 0.8 : 0.55);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
